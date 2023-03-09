@@ -1,8 +1,11 @@
 #include "MyForm.h"
+#using <System.dll>
 
 using namespace System;
 using namespace System::Windows::Forms;
-[STAThread]
+
+
+
 
 void main(array<String^>^ args)
 {
@@ -10,4 +13,6 @@ void main(array<String^>^ args)
     Application::SetCompatibleTextRenderingDefault(false);
     Arduinooutgauge::MyForm form;
     Application::Run(% form);
+
+    
 }
