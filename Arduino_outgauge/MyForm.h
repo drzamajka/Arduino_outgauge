@@ -118,7 +118,6 @@ namespace Arduinooutgauge {
 			// 
 			// timer1
 			// 
-			this->timer1->Interval = 1000;
 			this->timer1->Tick += gcnew System::EventHandler(this, &MyForm::timer1_Tick);
 			// 
 			// button1
@@ -319,10 +318,17 @@ namespace Arduinooutgauge {
 	}
 	private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) {
 		
-		if (serialPort1->IsOpen && serialPort1->BytesToRead>0) {
-			String^ mesage = serialPort1->ReadLine()->Trim();
-			if (mesage != "") {
-				listBox1->Items->Add("<< " + mesage);
+		if (serialPort1->IsOpen) {
+			listBox1->Items->Clear();
+			while (serialPort1->BytesToRead > 0) {
+				String^ mesage = serialPort1->ReadLine()->Trim();
+				if (mesage != "") {
+					if (mesage->StartsWith("FRAME:535;8;")) {
+						this->ciroccoAdaper->setBrightnes(mesage->Substring(12, 1));
+						listBox1->Items->Add("Brightnes: " + this->ciroccoAdaper->getBrightnes());
+					}
+					listBox1->Items->Add("<< " + mesage);
+				}
 			}
 		}
 
@@ -377,9 +383,9 @@ namespace Arduinooutgauge {
 	}
 	void Arduinooutgauge::MyForm::OnPacketReceived(System::Object^ sender, InSimDotNet::Out::OutGaugeEventArgs^ e)
 	{
-		this->ciroccoAdaper->RPM = e->RPM;
-		this->ciroccoAdaper->Speed = e->Speed*3.6;
-		this->ciroccoAdaper->TCoolant = e->EngTemp;
+		this->ciroccoAdaper->setRPM( e->RPM);
+		this->ciroccoAdaper->setSpeed(e->Speed*3.6);
+		this->ciroccoAdaper->setTCoolant(e->EngTemp);
 	}
 
 	void reloadSerialPortsList()
