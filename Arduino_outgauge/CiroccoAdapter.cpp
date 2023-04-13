@@ -14,6 +14,7 @@ namespace Arduinooutgauge {
 		private: bool Ignition;
 		private: int Odometer;
 		private: String^ Brightnes;
+		private: Char Gear;
 
 		private: System::IO::Ports::SerialPort^ serialPort;
 		private: System::Windows::Forms::Timer^ timer50;
@@ -31,6 +32,7 @@ namespace Arduinooutgauge {
 			this->timer1000->Tick += gcnew System::EventHandler(this, &CiroccoAdapter::timer1000_Tick);
 			this->RPM = 0;
 			this->Speed = 0;
+			this->Gear = '1';
 			this->TCoolant = 0;
 			this->LeftI = this->RightI = false;
 			this->Ignition = false;
@@ -84,6 +86,13 @@ namespace Arduinooutgauge {
 			this->Brightnes = Brightnes;
 		}
 
+		public: Char getGear() {
+			return this->Gear;
+		}
+
+		public: void setGear(Char Gear) {
+			this->Gear = Gear;
+		}
 
 		private: System::Void timer50_Tick(System::Object^ sender, System::EventArgs^ e) {
 			if (serialPort->IsOpen) {
@@ -98,9 +107,13 @@ namespace Arduinooutgauge {
 
 		private: System::Void timer1000_Tick(System::Object^ sender, System::EventArgs^ e) {
 			if (serialPort->IsOpen) {
+
+				String^ myString = Char::ToString(Gear);
+
 				String^ TCoolantHex = getTCoolantHex(this->TCoolant);
 				System::String^ mesage1 = "FRAME:036;8;0E:00:00:2"+ Brightnes +":01:00:00:A0;";
-				System::String^ mesage2 = "FRAME:128;8;00:B0:00:00:00:00:04:00;";
+				//System::String^ mesage2 = "FRAME:128;8;00:B0:00:00:00:00:04:00;";
+				System::String^ mesage2 = "FRAME:128;8;00:" + myString + "0:60:00:00:00:04:00;";
 				System::String^ mesage3 = "FRAME:0F6;8;8E:"+ TCoolantHex +":00:FF:FF:8F:00:00;";
 				System::String^ mesage4 = "FRAME:168;8;00:00:00:00:00:00:00:00;";
 
